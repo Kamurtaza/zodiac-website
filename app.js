@@ -3,62 +3,65 @@ import fetch from 'node-fetch';
 
 const app = express();
 
-// Serve static files from the 'public' folder
+// Serve static files from the 'public' folder (index.html, styles.css, etc.)
 app.use(express.static('public'));
 
 // Middleware to parse JSON data from the frontend
 app.use(express.json());
 
-const API = 'iKndOeWIN919AV2GRY0L36f0Vp4MUbv56wNFG8Hg';
+// API key (replace with your actual API key)
+const API_KEY = '5e03fe829176a5d7f4fbb29d1b4439c4'; 
 
-
+// Route to handle form submissions and fetch zodiac chart
 app.post('/getZodiacChart', async (req, res) => {
-    const { birthDate } = req.body;
-    const sunSign = calculateSunSign(new Date(birthDate));
+    const { name, birthDate, city } = req.body;  // Extract name, birthDate, and city from the form data
+    const birthDetails = new Date(birthDate);  // Convert birthDate to a JavaScript Date object
 
     try {
-        const apiUrl = `https://json.freeastrologyapi.com/`;
-        const response = await fetch(apiUrl);
+        // Extract day, month, year, hour, and minute from the birthDetails
+        const day = birthDetails.getDate();
+        const month = birthDetails.getMonth() + 1; // getMonth() returns 0-based index
+        const year = birthDetails.getFullYear();
+        const hour = birthDetails.getHours();
+        const min = birthDetails.getMinutes();
 
-        // Check if the response is OK
+        // API URL
+        const apiUrl = 'https://hook.eu2.make.com/n2ghu1vhbute5k11rfncjxwk7qmrhbnh';
+
+        // Make a POST request to the new API
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                Email: 'sam@example.com',  // You can also extract Email from the form if needed
+                Name: name,
+                Day: day.toString(),
+                Month: month.toString(),
+                Year: year.toString(),
+                Hour: hour.toString(),
+                Min: min.toString(),
+                City: city,
+                'x-api-key': API_KEY,  // Add the API key here
+            }),
+        });
+
+        // Check if the API request was successful (status 200-299)
         if (!response.ok) {
             throw new Error(`API request failed with status: ${response.status}`);
         }
 
         const data = await response.json();
 
-        // Find the zodiac data for the user's sun sign
-        const zodiacData = data.find(z => z.name.toLowerCase() === sunSign.toLowerCase());
+        // Send the Zodiac data back to the frontend
+        res.json(data);
 
-        if (zodiacData) {
-            res.json(zodiacData);
-        } else {
-            res.status(404).json({ message: 'Zodiac sign not found' });
-        }
     } catch (error) {
         console.error('Error fetching zodiac chart:', error);
         res.status(500).json({ message: 'Error fetching chart', error: error.message });
     }
 });
 
-
-// Function to calculate sun sign based on birth date
-function calculateSunSign(birthDate) {
-    const month = birthDate.getMonth() + 1;
-    const day = birthDate.getDate();
-
-    if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return 'Aries';
-    if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return 'Taurus';
-    if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) return 'Gemini';
-    if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) return 'Cancer';
-    if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return 'Leo';
-    if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return 'Virgo';
-    if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) return 'Libra';
-    if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return 'Scorpio';
-    if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) return 'Sagittarius';
-    if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) return 'Capricorn';
-    if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) return 'Aquarius';
-    if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) return 'Pisces';
-}
-
+// Start the server on port 3000
 app.listen(3000, () => console.log('Server running on port 3000'));

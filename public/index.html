@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zodiac Chart Generator</title>
+    <title>Zodiac Data Generator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Zodiac Chart Generator</h1>
+    <h1>Zodiac Data Generator</h1>
     <form id="zodiacForm">
-        <label for="birthDate">Date of Birth:</label>
-        <input type="date" id="birthDate" required><br><br>
+        <label for="name">Name:</label>
+        <input type="text" id="name" required><br><br>
 
-        <button type="submit">Get Your Zodiac Chart</button>
+        <label for="birthDate">Date of Birth:</label>
+        <input type="datetime-local" id="birthDate" required><br><br>
+
+        <label for="city">City:</label>
+        <input type="text" id="city" required><br><br>
+
+        <button type="submit">Get Your Zodiac Data</button>
     </form>
 
-    <div id="chartResult"></div>
+    <!-- Container to display the zodiac data as a list -->
+    <div id="zodiacListContainer"></div>
 
-    <script src="scripts/zodiacCalculator.js"></script>
+    <script src="scripts/zodiacCalculator.js"></script> <!-- Link to the updated JavaScript file -->
 </body>
 </html>
