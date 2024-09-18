@@ -21,7 +21,7 @@ document.getElementById('zodiacForm').addEventListener('submit', async function 
         const result = await response.json();
         console.log('API Response:', result);
 
-        displayZodiacList(result);  // Call the new function to display the list
+        displayZodiacList(result);  // Call the function to display the list
 
     } catch (error) {
         console.error('Error fetching zodiac chart:', error);
@@ -47,7 +47,8 @@ function displayZodiacList(data) {
 
     planetData.forEach(item => {
         const li = document.createElement('li');
-        li.textContent = `${item.planet}: ${item.degrees.toFixed(2)}°`;  // Display planet name and degrees
+        // Display planet name, zodiac sign, degrees, house, and retrograde/direct status
+        li.textContent = `${item.planet}: ${item.zodiacSign}, ${item.degrees.toFixed(2)}°, House ${item.house}, ${item.motion}`;
         ul.appendChild(li);
     });
 
@@ -62,12 +63,17 @@ function parseAstrologyData(data) {
     const planets = data.split(';');  // Split the response by ';' to get each planet's data
 
     planets.forEach(planetString => {
-        // Match the planet name and degree string (e.g., "Sun:Cancer, 8°52’05’’")
-        const planetMatch = planetString.match(/^([^:]+):([^,]+),\s*(\d+)°(\d+)’(\d+)’’/);
+        // Match the planet name, zodiac sign, degrees, and house
+        const planetMatch = planetString.match(/^([^:]+):([^,]+),\s*(\d+)°(\d+)’(\d+)’’,\s*House\s*(\d+),\s*(Direct|Retrograde)/);
+
         if (planetMatch) {
             const planetName = planetMatch[1].trim();  // Get the planet name (e.g., "Sun")
+            const zodiacSign = planetMatch[2].trim();  // Get the zodiac sign (e.g., "Cancer")
             const degrees = parseFloat(planetMatch[3]) + parseFloat(planetMatch[4]) / 60;  // Convert degree + minutes to decimal
-            planetData.push({ planet: planetName, degrees });
+            const house = planetMatch[6].trim();  // Get the house number
+            const motion = planetMatch[7].trim();  // Get Direct/Retrograde status
+
+            planetData.push({ planet: planetName, zodiacSign, degrees, house, motion });
         }
     });
 
